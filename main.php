@@ -39,6 +39,8 @@ class Chicken extends Animal
 class Farm
 {
     private $animals = [];
+    public $milk = 0;
+    public $eggs = 0;
 
     public function addCow($amount = 1)
     {
@@ -52,25 +54,22 @@ class Farm
             $this->animals[] = new Chicken();
         }
     }
-    public function collectResources()
-    {
-        $milk = $eggs = 0;
+    public function collectResources(){
         foreach ($this->animals as $value) {
             switch ($value->getClass()) {
                 case "Cow":
-                    $milk += $value->getProduct();
+                    $this->milk += $value->getProduct();
                     break;
                 case "Chicken":
-                    $eggs += $value->getProduct();
+                    $this->eggs += $value->getProduct();
                     break;
             }
         }
-        return ['milk' => $milk, 'eggs' => $eggs];
     }
 }
 
 $farm = new Farm();
 $farm->addCow(10);
 $farm->addChicken(20);
-$resources = $farm->collectResources();
-echo "Собрано {$resources['milk']} литров молока и {$resources['eggs']} яиц";
+$farm->collectResources();
+echo "Собрано {$farm->milk} литров молока и {$farm->eggs} яиц";
