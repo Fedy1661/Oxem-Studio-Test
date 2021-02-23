@@ -1,59 +1,73 @@
 <?php
+abstract class Animal
+{
+    static $amount = 0;
+
+    public $id;
+
+    abstract function __construct();
+    abstract function getProduct();
+    public function getClass()
+    {
+        return get_class($this);
+    }
+}
+
+
+class Cow extends Animal
+{
+    function __construct()
+    {
+        $this->id = ++parent::$amount;
+    }
+    function getProduct()
+    {
+        return rand(8, 12);
+    }
+}
+
+class Chicken extends Animal
+{
+    function __construct()
+    {
+        $this->id = ++parent::$amount;
+    }
+    function getProduct()
+    {
+        return rand(0, 1);
+    }
+}
+
 class Farm
 {
-    private $animals = array();
-
-    private $chars = "qazxswedcvfrtgbnhyujmkiolp1234567890QAZXSWEDCVFRTGBNHYUJMKIOLP";
-    private $max_id = 6;
-
-    public function add_animal($type, $amount_animals = 1, $range = null)
+    public function addCow()
     {
-        if (array_key_exists($type, $this->animals)) {
-            $ids = $this->animals[$type]['ids'];
-            $this->animals[$type]['ids'] =
-                array_merge($ids, $this->get_id($amount_animals));
-        } else {
-            $this->animals[$type] = [
-                'ids' => $this->get_id($amount_animals),
-                'range' => $range,
-                'collected' => 0
-            ];
-        }
+        return new Cow();
     }
-
-    public function collect_products()
+    public function addChicken()
     {
-        $total_products = array();
-        foreach ($this->animals as $key => $value) {
-            $amount = count($value['ids']);
-            $products = $value['collected'];
-            $range = $value['range'];
-            for ($i = 0; $i < $amount; $i++) {
-                $products += rand($range[0], $range[1]);
-            }
-            $total_products[$key] = $products;
-            $this->animals[$key]['collected'] = $products;
-        }
-
-        return $total_products;
-    }
-
-    private function get_id($amount = 1)
-    {
-        $ids = [];
-        for ($i = 0; $i < $amount; $i++) {
-            $id = "";
-            for ($j = 0; $j < $this->max_id; $j++) {
-                $id .= $this->chars[rand(0, 61)];
-            }
-            array_push($ids, $id);
-        }
-        return $ids;
+        return new Chicken();
     }
 }
 
 $farm = new Farm();
-$farm->add_animal('cow', 10, [8, 12]);
-$farm->add_animal('chicken', 20, [0, 1]);
-$products = $farm->collect_products();
-echo "Собрано {$products['cow']} литров молока и {$products['chicken']} яиц";
+$allAnimals = [];
+for ($i = 0; $i < 20; $i++) {
+    $allAnimals[] = $farm->addChicken();
+}
+for ($i = 0; $i < 10; $i++) {
+    $allAnimals[] = $farm->addCow();
+}
+
+$liters = $eggs = 0;
+foreach ($allAnimals as $value) {
+    switch ($value->getClass()) {
+        case "Cow":
+            $liters += $value->getProduct();
+            break;
+        case "Chicken":
+            $eggs += $value->getProduct();
+            break;
+    }
+}
+echo "Собрано {$liters} литров молока и {$eggs} яиц";
