@@ -3,8 +3,6 @@ abstract class Animal
 {
     static $amount = 0;
 
-    public $id;
-
     abstract function __construct();
     abstract function getProduct();
     public function getClass()
@@ -40,34 +38,39 @@ class Chicken extends Animal
 
 class Farm
 {
-    public function addCow()
+    private $animals = [];
+
+    public function addCow($amount = 1)
     {
-        return new Cow();
+        for ($i = 0; $i < $amount; $i++) {
+            $this->animals[] = new Cow();
+        }
     }
-    public function addChicken()
+    public function addChicken($amount = 1)
     {
-        return new Chicken();
+        for ($i = 0; $i < $amount; $i++) {
+            $this->animals[] = new Chicken();
+        }
+    }
+    public function collectResources()
+    {
+        $milk = $eggs = 0;
+        foreach ($this->animals as $value) {
+            switch ($value->getClass()) {
+                case "Cow":
+                    $milk += $value->getProduct();
+                    break;
+                case "Chicken":
+                    $eggs += $value->getProduct();
+                    break;
+            }
+        }
+        return ['milk' => $milk, 'eggs' => $eggs];
     }
 }
 
 $farm = new Farm();
-$allAnimals = [];
-for ($i = 0; $i < 20; $i++) {
-    $allAnimals[] = $farm->addChicken();
-}
-for ($i = 0; $i < 10; $i++) {
-    $allAnimals[] = $farm->addCow();
-}
-
-$liters = $eggs = 0;
-foreach ($allAnimals as $value) {
-    switch ($value->getClass()) {
-        case "Cow":
-            $liters += $value->getProduct();
-            break;
-        case "Chicken":
-            $eggs += $value->getProduct();
-            break;
-    }
-}
-echo "Собрано {$liters} литров молока и {$eggs} яиц";
+$farm->addCow(10);
+$farm->addChicken(20);
+$resources = $farm->collectResources();
+echo "Собрано {$resources['milk']} литров молока и {$resources['eggs']} яиц";
