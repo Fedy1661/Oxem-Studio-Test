@@ -47,8 +47,15 @@ class Farm
 
     public function addAnimal($type, $amount)
     {
-        for ($i = 0; $i < $amount; $i++) {
-            $this->animals[] = new $type();
+        if (
+            class_exists($type) and
+            filter_var($amount, FILTER_VALIDATE_INT, ["options" => ["min_range" => 1]])
+        ) {
+            for ($i = 0; $i < $amount; $i++) {
+                $this->animals[] = new $type();
+            }
+        } else {
+            echo "Incorrect data.\n";
         }
     }
 
@@ -56,7 +63,6 @@ class Farm
     {
         $resources = [];
         foreach ($this->animals as $value) {
-            print_r($value);
             $typeOfAnimal = $value->getClass();
             if (array_key_exists($typeOfAnimal, $resources)) {
                 $resources[$typeOfAnimal] += $value->getProduct();
